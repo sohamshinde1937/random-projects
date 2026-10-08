@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhagyalaxmi Collection — Cloth Business Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #c0392b;
+    --rose-light: #f9eae8;
+    --rose-mid: #e8b4ae;
+    --gold: #b8860b;
+    --gold-light: #fdf6e3;
+    --cream: #fdf8f4;
+    --warm-white: #fff9f5;
+    --text: #2c1810;
+    --text-muted: #7a5c52;
+    --border: #e8d5cc;
+    --green: #2e7d32;
+    --green-light: #e8f5e9;
+    --red: #c62828;
+    --red-light: #ffebee;
+    --blue: #1565c0;
+    --blue-light: #e3f2fd;
+    --shadow: 0 2px 12px rgba(44,24,16,0.08);
+    --shadow-lg: 0 8px 32px rgba(44,24,16,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #8b1a10 0%, #c0392b 60%, #922b21 100%);
+    color: white;
+    padding: 1.2rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(139,26,16,0.3);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .logo p { font-size: 0.78rem; opacity: 0.8; font-weight: 300; margin-top: 1px; }
+  .header-date { font-size: 0.85rem; opacity: 0.85; text-align: right; }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: white;
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    padding: 0 2rem;
+    box-shadow: var(--shadow);
+  }
+  .nav-tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-tab:hover { color: var(--rose); }
+  .nav-tab.active { color: var(--rose); border-bottom-color: var(--rose); }
+
+  /* MAIN CONTENT */
+  .content { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+  }
+  .stat-card.invested { border-left-color: var(--blue); }
+  .stat-card.earned { border-left-color: var(--green); }
+  .stat-card.profit { border-left-color: #f39c12; }
+  .stat-card.items { border-left-color: var(--rose); }
+  .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.6rem; font-weight: 600; font-family: 'Playfair Display', serif; }
+  .stat-card.invested .stat-value { color: var(--blue); }
+  .stat-card.earned .stat-value { color: var(--green); }
+  .stat-card.profit .stat-value { color: #e67e22; }
+  .stat-card.items .stat-value { color: var(--rose); }
+
+  /* SECTION HEADERS */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* FORMS */
+  .form-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    color: var(--rose);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--warm-white);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--rose);
+    background: white;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--rose); color: white; }
+  .btn-primary:hover { background: #a93226; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(192,57,43,0.35); }
+  .btn-success { background: var(--green); color: white; }
+  .btn-success:hover { background: #1b5e20; transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--rose); color: var(--rose); }
+  .btn-danger { background: transparent; color: var(--red); border: 1.5px solid #ffcdd2; font-size: 0.8rem; padding: 0.35rem 0.7rem; }
+  .btn-danger:hover { background: var(--red-light); }
+  .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+
+  /* TABLES */
+  .table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: linear-gradient(135deg, #fdf0ed, #fce4de); }
+  thead th {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--rose);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  tbody tr { border-bottom: 1px solid #fdf0ed; transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fffaf9; }
+  tbody td { padding: 0.85rem 1rem; font-size: 0.88rem; color: var(--text); }
+  .empty-row td { text-align: center; color: var(--text-muted); padding: 2.5rem; font-size: 0.95rem; }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+
+  /* PROFIT PAGE */
+  .profit-summary {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .profit-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+  }
+  .profit-big.positive { color: var(--green); }
+  .profit-big.negative { color: var(--red); }
+  .profit-meta { color: var(--text-muted); font-size: 0.88rem; }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .breakdown-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .breakdown-card h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #fdf0ed;
+    font-size: 0.88rem;
+  }
+  .breakdown-item:last-child { border-bottom: none; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #2e2e2e;
+    color: white;
+    padding: 0.85rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 999;
+    max-width: 320px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: #1b5e20; }
+  .toast.error { background: #b71c1c; }
+
+  /* SEARCH */
+  .search-bar {
+    display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;
+  }
+  .search-bar input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: white;
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--rose); }
+
+  @media (max-width: 600px) {
+    .content { padding: 1rem; }
+    .breakdown-grid { grid-template-columns: 1fr; }
+    .nav-tab { padding: 0.75rem 0.9rem; font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧵</div>
+    <div>
+      <h1>Bhagyalaxmi Collection</h1>
+      <p>Cloth Business Manager</p>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="showPage('dashboard')" id="tab-dashboard">📊 Dashboard</div>
+  <div class="nav-tab" onclick="showPage('stock')" id="tab-stock">📦 Stock / Purchase</div>
+  <div class="nav-tab" onclick="showPage('sales')" id="tab-sales">💰 Sales</div>
+  <div class="nav-tab" onclick="showPage('profit')" id="tab-profit">📈 Profit & Loss</div>
+</nav>
+
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card invested">
+        <div class="stat-label">Total Invested</div>
+        <div class="stat-value" id="stat-invested">₹0</div>
+      </div>
+      <div class="stat-card earned">
+        <div class="stat-label">Total Earned</div>
+        <div class="stat-value" id="stat-earned">₹0</div>
+      </div>
+      <div class="stat-card profit">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value" id="stat-profit">₹0</div>
+      </div>
+      <div class="stat-card items">
+        <div class="stat-label">Items in Stock</div>
+        <div class="stat-value" id="stat-items">0</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Recent Activity</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="recent-table">
+          <tr class="empty-row"><td colspan="5">No records yet. Add stock or sales to begin.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STOCK PAGE -->
+  <div class="page" id="page-stock">
+    <div class="form-card">
+      <div class="form-title">🧵 Add New Stock / Purchase</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Cloth Name</label>
+          <input type="text" id="s-name" placeholder="e.g. Banarasi Silk">
+        </div>
+        <div class="form-group">
+          <label>Cloth Type</label>
+          <select id="s-type">
+            <option value="">Select type...</option>
+            <option>Silk</option>
+            <option>Cotton</option>
+            <option>Chiffon</option>
+            <option>Georgette</option>
+            <option>Linen</option>
+            <option>Velvet</option>
+            <option>Polyester</option>
+            <option>Woolen</option>
+            <option>Net</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Color / Design</label>
+          <input type="text" id="s-color" placeholder="e.g. Red floral">
+        </div>
+        <div class="form-group">
+          <label>Quantity (meters/pieces)</label>
+          <input type="number" id="s-qty" placeholder="e.g. 10" min="0">
+        </div>
+        <div class="form-group">
+          <label>Purchase Price (₹) per unit</label>
+          <input type="number" id="s-price" placeholder="e.g. 250" min="0">
+        </div>
+        <div class="form-group">
+          <label>Date of Purchase</label>
+          <input type="date" id="s-date">
+        </div>
+        <div class="form-group">
+          <label>Supplier Name</label>
+          <input type="text" id="s-supplier" placeholder="e.g. Sharma Textiles">
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="s-unit">
+            <option>meters</option>
+            <option>pieces</option>
+            <option>sets</option>
+            <option>yards</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addStock()">+ Add to Stock</button>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Stock Inventory</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="stock-search" placeholder="Search by name, type or color..." oninput="renderStockTable()">
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Color/Design</th>
+            <th>Qty Remaining</th>
+            <th>Buy Price</th>
+            <th>Date</th>
+            <th>Supplier</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="stock-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SALES PAGE -->
+  <div class="page" id="page-sales">
+    <div class="form-card">
+      <div class="form-title">💰 Record a Sale</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Select Item from Stock</label>
+          <select id="sale-item" onchange="fillSalePrice()">
+            <option value="">Choose item...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" id="sale-customer" placeholder="e.g. Priya Sharma">
+        </div>
+        <div class="form-group">
+          <label>Quantity Sold</label>
+          <input type="number" id="sale-qty" placeholder="e.g. 3" min="1" oninput="calcSaleTotal()">
+        </div>
+        <div class="form-group">
+          <label>Selling Price (₹) per unit</label>
+          <input type="number" id="sale-price" placeholder="e.g. 400" min="0" oninput="calcSaleTotal()">
+        </div>
+        <div class="form-group">
+          <label>Total Amount (₹)</label>
+          <input type="number" id="sale-total" placeholder="Auto calculated" readonly style="background:#f5f5f5">
+        </div>
+        <div class="form-group">
+          <label>Date of Sale</label>
+          <input type="date" id="sale-date">
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select id="sale-payment">
+            <option>Cash</option>
+            <option>UPI</option>
+            <option>Credit</option>
+            <option>Bank Transfer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="sale-notes" placeholder="Optional notes...">
+        </div>
+      </div>
+      <button class="btn btn-success" onclick="addSale()">✓ Record Sale</button>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Sales History</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="sales-search" placeholder="Search by item or customer..." oninput="renderSalesTable()">
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Item</th>
+            <th>Customer</th>
+            <th>Qty</th>
+            <th>Sell Price</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Profit</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="sales-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROFIT PAGE -->
+  <div class="page" id="page-profit">
+    <div class="profit-summary">
+      <div style="font-size:0.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600">Net Profit / Loss</div>
+      <div class="profit-big" id="profit-big">₹0</div>
+      <div class="profit-meta" id="profit-meta">No transactions yet</div>
+    </div>
+
+    <div class="breakdown-grid">
+      <div class="breakdown-card">
+        <h3>💸 Total Purchases</h3>
+        <div id="purchase-breakdown">
+          <div class="breakdown-item"><span style="color:var(--text-muted)">No purchases yet</span></div>
+        </div>
+      </div>
+      <div class="breakdown-card">
+        <h3>💰 Total Sales</h3>
+        <div id="sales-breakdown">
+          <div class="breakdown-item"><span style="color:var(--text-muted)">No sales yet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Item-wise Profit</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Total Purchased</th>
+            <th>Total Sold</th>
+            <th>Revenue</th>
+            <th>Cost</th>
+            <th>Profit</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="profit-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---- DATA ----
+  let stock = JSON.parse(localStorage.getItem('kg_stock') || '[]');
+  let sales = JSON.parse(localStorage.getItem('kg_sales') || '[]');
+
+  function save() {
+    localStorage.setItem('kg_stock', JSON.stringify(stock));
+    localStorage.setItem('kg_sales', JSON.stringify(sales));
+  }
+
+  // ---- UTILS ----
+  function today() {
+    return new Date().toISOString().split('T')[0];
+  }
+  function fmt(n) {
+    return '₹' + Number(n).toLocaleString('en-IN');
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
+  }
+  function toast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function id(x) { return document.getElementById(x); }
+
+  // ---- HEADER DATE ----
+  function updateDate() {
+    const now = new Date();
+    id('headerDate').innerHTML = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + '<br><span style="font-size:0.75rem;opacity:0.7">Business Record System</span>';
+  }
+  updateDate();
+
+  // ---- NAVIGATION ----
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    id('page-' + page).classList.add('active');
+    id('tab-' + page).classList.add('active');
+    if (page === 'dashboard') renderDashboard();
+    if (page === 'stock') { renderStockTable(); setDefaults(); }
+    if (page === 'sales') { populateSaleItems(); renderSalesTable(); setDefaults(); }
+    if (page === 'profit') renderProfit();
+  }
+
+  function setDefaults() {
+    const today_val = today();
+    if (id('s-date') && !id('s-date').value) id('s-date').value = today_val;
+    if (id('sale-date') && !id('sale-date').value) id('sale-date').value = today_val;
+  }
+
+  // ---- STOCK ----
+  function addStock() {
+    const name = id('s-name').value.trim();
+    const type = id('s-type').value;
+    const color = id('s-color').value.trim();
+    const qty = parseFloat(id('s-qty').value);
+    const price = parseFloat(id('s-price').value);
+    const date = id('s-date').value;
+    const supplier = id('s-supplier').value.trim();
+    const unit = id('s-unit').value;
+
+    if (!name || !type || !qty || !price || !date) {
+      toast('Please fill Name, Type, Qty, Price and Date', 'error'); return;
+    }
+
+    const item = { id: Date.now(), name, type, color, qty, qtyLeft: qty, price, date, supplier, unit };
+    stock.push(item);
+    save();
+
+    // clear form
+    ['s-name','s-color','s-qty','s-price','s-supplier'].forEach(f => id(f).value = '');
+    id('s-type').value = ''; id('s-unit').value = 'meters';
+    id('s-date').value = today();
+
+    toast('✓ Stock added: ' + name);
+    renderStockTable();
+    renderDashboard();
+  }
+
+  function deleteStock(sid) {
+    if (!confirm('Delete this stock item?')) return;
+    stock = stock.filter(s => s.id != sid);
+    save(); renderStockTable(); renderDashboard();
+    toast('Stock item deleted');
+  }
+
+  function renderStockTable() {
+    const q = (id('stock-search')?.value || '').toLowerCase();
+    const tbody = id('stock-table');
+    const filtered = stock.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.type.toLowerCase().includes(q) ||
+      (s.color||'').toLowerCase().includes(q)
+    );
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No stock items found.</td></tr>'; return;
+    }
+    tbody.innerHTML = filtered.map(s => `
+      <tr>
+        <td><strong>${s.name}</strong></td>
+        <td><span class="badge badge-blue">${s.type}</span></td>
+        <td>${s.color || '—'}</td>
+        <td><span class="${s.qtyLeft < 2 ? 'badge badge-red' : 'badge badge-green'}">${s.qtyLeft} ${s.unit}</span></td>
+        <td>${fmt(s.price)}</td>
+        <td>${fmtDate(s.date)}</td>
+        <td>${s.supplier || '—'}</td>
+        <td><button class="btn btn-danger" onclick="deleteStock(${s.id})">Delete</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // ---- SALES ----
+  function populateSaleItems() {
+    const sel = id('sale-item');
+    sel.innerHTML = '<option value="">Choose item...</option>';
+    stock.filter(s => s.qtyLeft > 0).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.name} (${s.type}) — ${s.qtyLeft} ${s.unit} left`;
+      sel.appendChild(opt);
+    });
+  }
+
+  function fillSalePrice() {
+    const sid = id('sale-item').value;
+    if (!sid) return;
+    const s = stock.find(x => x.id == sid);
+    if (s) {
+      id('sale-price').value = Math.round(s.price * 1.3);
+      calcSaleTotal();
+    }
+  }
+
+  function calcSaleTotal() {
+    const qty = parseFloat(id('sale-qty').value) || 0;
+    const price = parseFloat(id('sale-price').value) || 0;
+    id('sale-total').value = qty * price;
+  }
+
+  function addSale() {
+    const sid = id('sale-item').value;
+    const customer = id('sale-customer').value.trim();
+    const qty = parseFloat(id('sale-qty').value);
+    const price = parseFloat(id('sale-price').value);
+    const date = id('sale-date').value;
+    const payment = id('sale-payment').value;
+    const notes = id('sale-notes').value.trim();
+
+    if (!sid || !qty || !price || !date) {
+      toast('Please fill Item, Qty, Price and Date', 'error'); return;
+    }
+
+    const stockItem = stock.find(s => s.id == sid);
+    if (!stockItem) { toast('Item not found', 'error'); return; }
+    if (qty > stockItem.qtyLeft) {
+      toast(`Only ${stockItem.qtyLeft} ${stockItem.unit} available in stock`, 'error'); return;
+    }
+
+    const total = qty * price;
+    const cost = qty * stockItem.price;
+    const profit = total - cost;
+
+    const sale = {
+      id: Date.now(),
+      stockId: sid,
+      itemName: stockItem.name,
+      itemType: stockItem.type,
+      customer: customer || 'Walk-in',
+      qty,
+      unit: stockItem.unit,
+      buyPrice: stockItem.price,
+      sellPrice: price,
+      total,
+      cost,
+      profit,
+      date,
+      payment,
+      notes
+    };
+
+    sales.push(sale);
+    stockItem.qtyLeft -= qty;
+    save();
+
+    ['sale-customer','sale-qty','sale-price','sale-total','sale-notes'].forEach(f => id(f).value = '');
+    id('sale-item').value = ''; id('sale-payment').value = 'Cash';
+    id('sale-date').value = today();
+
+    toast(`✓ Sale recorded! Profit: ${fmt(profit)}`);
+    renderSalesTable(); renderDashboard(); populateSaleItems();
+  }
+
+  function deleteSale(salid) {
+    if (!confirm('Delete this sale?')) return;
+    const s = sales.find(x => x.id == salid);
+    if (s) {
+      const si = stock.find(x => x.id == s.stockId);
+      if (si) si.qtyLeft += s.qty;
+      sales = sales.filter(x => x.id != salid);
+      save(); renderSalesTable(); renderDashboard(); populateSaleItems();
+      toast('Sale deleted and stock restored');
+    }
+  }
+
+  function renderSalesTable() {
+    const q = (id('sales-search')?.value || '').toLowerCase();
+    const tbody = id('sales-table');
+    const filtered = sales.filter(s =>
+      s.itemName.toLowerCase().includes(q) ||
+      (s.customer||'').toLowerCase().includes(q)
+    ).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No sales recorded yet.</td></tr>'; return;
+    }
+    tbody.innerHTML = filtered.map(s => `
+      <tr>
+        <td>${fmtDate(s.date)}</td>
+        <td><strong>${s.itemName}</strong><br><span style="font-size:0.75rem;color:var(--text-muted)">${s.itemType}</span></td>
+        <td>${s.customer}</td>
+        <td>${s.qty} ${s.unit}</td>
+        <td>${fmt(s.sellPrice)}</td>
+        <td><strong>${fmt(s.total)}</strong></td>
+        <td><span class="badge badge-gold">${s.payment}</span></td>
+        <td><span class="${s.profit >= 0 ? 'badge badge-green' : 'badge badge-red'}">${fmt(s.profit)}</span></td>
+        <td><button class="btn btn-danger" onclick="deleteSale(${s.id})">Delete</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // ---- DASHBOARD ----
+  function renderDashboard() {
+    const totalInvested = stock.reduce((a,s) => a + s.qty * s.price, 0);
+    const totalEarned = sales.reduce((a,s) => a + s.total, 0);
+    const totalProfit = sales.reduce((a,s) => a + s.profit, 0);
+    const totalItems = stock.reduce((a,s) => a + s.qtyLeft, 0);
+
+    id('stat-invested').textContent = fmt(totalInvested);
+    id('stat-earned').textContent = fmt(totalEarned);
+    id('stat-profit').textContent = fmt(totalProfit);
+    id('stat-items').textContent = totalItems;
+
+    const recentTbody = id('recent-table');
+    const all = [
+      ...stock.map(s => ({ date: s.date, type: 'Purchase', item: s.name, qty: s.qty + ' ' + s.unit, amount: fmt(s.qty * s.price), _d: s.date })),
+      ...sales.map(s => ({ date: s.date, type: 'Sale', item: s.itemName, qty: s.qty + ' ' + s.unit, amount: fmt(s.total), _d: s.date }))
+    ].sort((a,b) => new Date(b._d) - new Date(a._d)).slice(0, 10);
+
+    if (!all.length) {
+      recentTbody.innerHTML = '<tr class="empty-row"><td colspan="5">No records yet. Add stock or sales to begin.</td></tr>';
+      return;
+    }
+    recentTbody.innerHTML = all.map(r => `
+      <tr>
+        <td>${fmtDate(r.date)}</td>
+        <td><span class="badge ${r.type === 'Sale' ? 'badge-green' : 'badge-blue'}">${r.type}</span></td>
+        <td>${r.item}</td>
+        <td>${r.qty}</td>
+        <td><strong>${r.amount}</strong></td>
+      </tr>
+    `).join('');
+  }
+
+  // ---- PROFIT ----
+  function renderProfit() {
+    const totalProfit = sales.reduce((a,s) => a + s.profit, 0);
+    const totalRevenue = sales.reduce((a,s) => a + s.total, 0);
+    const totalCost = sales.reduce((a,s) => a + s.cost, 0);
+    const totalInvested = stock.reduce((a,s) => a + s.qty * s.price, 0);
+
+    const pb = id('profit-big');
+    pb.textContent = fmt(totalProfit);
+    pb.className = 'profit-big ' + (totalProfit >= 0 ? 'positive' : 'negative');
+
+    id('profit-meta').textContent = `Based on ${sales.length} sale(s) across ${stock.length} item(s)`;
+
+    // purchase breakdown
+    const purchaseDiv = id('purchase-breakdown');
+    if (!stock.length) {
+      purchaseDiv.innerHTML = '<div class="breakdown-item"><span style="color:var(--text-muted)">No purchases yet</span></div>';
+    } else {
+      purchaseDiv.innerHTML = stock.map(s => `
+        <div class="breakdown-item">
+          <span>${s.name} (${s.qty} ${s.unit})</span>
+          <strong>${fmt(s.qty * s.price)}</strong>
+        </div>
+      `).join('') + `
+        <div class="breakdown-item" style="font-weight:600;margin-top:4px">
+          <span>Total</span><span style="color:var(--blue)">${fmt(totalInvested)}</span>
+        </div>`;
+    }
+
+    // sales breakdown
+    const salesDiv = id('sales-breakdown');
+    if (!sales.length) {
+      salesDiv.innerHTML = '<div class="breakdown-item"><span style="color:var(--text-muted)">No sales yet</span></div>';
+    } else {
+      const byDate = {};
+      sales.forEach(s => { byDate[s.date] = (byDate[s.date]||0) + s.total; });
+      salesDiv.innerHTML = Object.entries(byDate).sort((a,b) => new Date(b[0]) - new Date(a[0])).slice(0,6).map(([d,v]) => `
+        <div class="breakdown-item"><span>${fmtDate(d)}</span><strong>${fmt(v)}</strong></div>
+      `).join('') + `
+        <div class="breakdown-item" style="font-weight:600;margin-top:4px">
+          <span>Total Revenue</span><span style="color:var(--green)">${fmt(totalRevenue)}</span>
+        </div>`;
+    }
+
+    // item-wise profit table
+    const pTbody = id('profit-table');
+    const itemMap = {};
+    stock.forEach(s => {
+      itemMap[s.id] = { name: s.name, type: s.type, purchased: s.qty, revenue: 0, cost: 0, profit: 0, sold: 0 };
+    });
+    sales.forEach(s => {
+      if (itemMap[s.stockId]) {
+        itemMap[s.stockId].revenue += s.total;
+        itemMap[s.stockId].cost += s.cost;
+        itemMap[s.stockId].profit += s.profit;
+        itemMap[s.stockId].sold += s.qty;
+      }
+    });
+    const items = Object.values(itemMap);
+    if (!items.length) {
+      pTbody.innerHTML = '<tr class="empty-row"><td colspan="7">No data yet.</td></tr>';
+    } else {
+      pTbody.innerHTML = items.map(i => `
+        <tr>
+          <td><strong>${i.name}</strong><br><span style="font-size:0.75rem;color:var(--text-muted)">${i.type}</span></td>
+          <td>${i.purchased}</td>
+          <td>${i.sold}</td>
+          <td>${fmt(i.revenue)}</td>
+          <td>${fmt(i.cost)}</td>
+          <td><strong>${fmt(i.profit)}</strong></td>
+          <td><span class="badge ${i.profit > 0 ? 'badge-green' : i.profit < 0 ? 'badge-red' : 'badge-gold'}">${i.profit > 0 ? 'Profit' : i.profit < 0 ? 'Loss' : 'Break-even'}</span></td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // ---- INIT ----
+  renderDashboard();
+  setDefaults();
+</script>
+</body>
+</html>
